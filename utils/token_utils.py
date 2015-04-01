@@ -3,7 +3,7 @@ import nltk
 from collections import namedtuple
 from nltk.tokenize import sent_tokenize, word_tokenize
 
-WordTag = namedtuple('WordTag', 'word, tag')
+WordInfo = namedtuple('WordInfo', 'word, tag')
 
 
 def tokenize_text(text):
@@ -11,6 +11,6 @@ def tokenize_text(text):
 
 
 def pos_tag_text(text):
-    tokenized = tokenize_text(text)
-    return [WordTag(w, t) for sent in tokenized for w, t in nltk.pos_tag(sent)]
+    tokens = tokenize_text(text)
+    return [WordInfo(w, t) for sent in tokens for w, t in nltk.pos_tag(sent)]
 

@@ -1,6 +1,6 @@
 # General Algorithm
 # 1) Add a start node, followed by a linear path of the words in 
-#    the first sentence as nodes, and an end node
+# the first sentence as nodes, and an end node
 # 2) For each word in additional sentences:
 #      a) If stopword, include it only if there is some overlapping
 #		  in non-stopword neighbors 
@@ -12,22 +12,21 @@
 #         its seen sentences list
 
 
-class word_graph:
+class Word_Graph:
+    def __init__(self, sentence, stop_words=[]):
+        # graph is just a list of nodes
+        self.graph = []
+        self.stop_words = stop_words
 
-	def __init__(sentence, stop_words=[]):
-		# graph is just a list of nodes
-		self.graph = []
-		self.stop_words = stop_words
-		# TODO(ethan or lizzy): Add first sentence to word graph
+    # TODO(ethan or lizzy): Add first sentence to word graph
 
+    def add_sentence(self, sentence, sentence_id):
+        # Adds a sentence to the word graph
+        # Sentence is list of pre-tagged words that are represented as named tuples (word, tag)
+        pass
 
-	# Adds a sentence to the word graph
-	# Sentence is list of pre-tagged words that are represented as named tuples (word, tag)
-	def add_sentence(sentence, sentence_id):
-		
-
-	# Returns the shortest path
-	# TODO(jorge)
-    def shortest_path(min_sentence_length, k):
-
+    def shortest_path(self, min_sentence_length, k):
+        # Returns the shortest path
+        # TODO(jorge)
+        pass
 

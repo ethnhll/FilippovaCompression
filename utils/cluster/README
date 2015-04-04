@@ -1,0 +1,14 @@
+I'll put this in a makefile at some point if that's desireable
+also I can move the stoplist path to wherever you want it, just need to change the path in the main class .java file
+This uses a permissible license stemmer that was not made by our group. details are in Stemmer.java
+
+assumes java 7 or better
+from working directory = here
+to compile do
+javac -d bin src/sentenceCluster/*.java
+to run do
+java -cp ./bin sentenceCluster.SimClusterMain
+to clean do
+rm src/sentenceCluster/*
+
+takes sentences from STDIN clusters them in a single pass after consuming and tokenizing all of them then outputs the clusters to STDOUT

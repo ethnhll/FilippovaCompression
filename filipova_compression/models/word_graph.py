@@ -20,9 +20,10 @@ class Word_Graph:
 
     # TODO(ethan or lizzy): Add first sentence to word graph
 
-    def add_sentence(self, sentence, sentence_id):
+    def add_sentence(self, sentence):
         # Adds a sentence to the word graph
         # Sentence is list of pre-tagged words that are represented as named tuples (word, tag)
+
         pass
 
     def shortest_path(self, min_sentence_length, k):

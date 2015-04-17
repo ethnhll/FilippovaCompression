@@ -3,11 +3,7 @@ package sentenceCluster;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -34,14 +30,15 @@ public class SimClusterMain {
 		
 		//clean up the sents in preperation to cluster
 		//it is assumed that the stoplist is in the same directory as the executable
-		Set<String> stoplist = loadStoplist("data/stoplist");
+		Set<String> stoplist = SimilarityClusterer.loadStoplist("data/stoplist");
 		List<List<String>> clusterSents = new ArrayList<List<String>>();
-		for(String s : inputSents) clusterSents.add(sanitize(s,stoplist));
+		for(String s : inputSents) clusterSents.add(SimilarityClusterer.sanitize(s,stoplist));
 
 		//and cluster them
 		SimilarityClusterer c = new SimilarityClusterer(clusterSents);
-		c.setThresh(0.2);
-		c.setWidth(5);
+		//this is as coarse as it can really go. note that some sentences are in clusters of size 1 (but not many)
+		c.setThresh(0.01);
+		c.setWidth(10);
 		List<List<Integer>> clusters = c.cluster();
 		for(List<Integer> i : clusters) {
 			for(int j = 0; j < i.size(); j++) {
@@ -53,31 +50,5 @@ public class SimClusterMain {
 				}
 			}
 		}
-	}
-
-	//it is assumed that the stoplist is a newline delimited list of single words
-	private static Set<String> loadStoplist(String filename) {
-		try {
-			return new HashSet<String>(Files.readAllLines(FileSystems.getDefault().getPath(filename),StandardCharsets.UTF_8));			
-		}
-		catch(Exception e) {
-			return null;
-		}
-	}
-	//some of this is extraneous if the passed in strings to program are already somewhat clean
-	private static List<String> sanitize(String sent,Set<String> stoplist){
-		sent = sent.toLowerCase();//drop caps
-		sent = sent.replaceAll("(.|!|?)", "");//drop end of sentence (and acronyms)
-		sent = sent.replaceAll("(-|:)"," ");//swap out non whitespace word seperators
-		sent = sent.replaceAll("\\s+", " ").trim();//drop excess whitespace
-		List<String> output = new ArrayList<String>();
-		for(String s : sent.split(" "))//naive segment 
-		{
-			if(stoplist.contains(s)) continue;
-			Stemmer stemmer = new Stemmer();
-			stemmer.add(s.toCharArray(),s.length());
-			output.add(stemmer.toString());
-		}
-		return output;
 	}
 }

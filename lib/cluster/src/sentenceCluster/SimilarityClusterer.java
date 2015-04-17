@@ -1,4 +1,7 @@
 package sentenceCluster;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,7 +23,7 @@ public class SimilarityClusterer {
 	public SimilarityClusterer(List<List<String>> sents) {
 		this.sents = sents;
 		width = 5;//arbitrary default
-		thresh = 0.2;//arbitrary default
+		thresh = 0.1;//arbitrary default
 		idf = new HashMap<String,Double>();
 		Set<String> wordlist = new HashSet<String>();
 		for(List<String> sent : sents) {
@@ -94,8 +97,68 @@ public class SimilarityClusterer {
 				centroids.add(new ArrayList<String>());
 				clusterTF.add(new HashMap<String,Integer>());
 			}
+			clusters.get(simCluster).add(i);
 			updateCluster(clusters.get(simCluster),centroids.get(simCluster),clusterTF.get(simCluster),sent);
 		}
+		//run a second pass on all sentences in their own cluster
+		List<Integer> holdouts = new ArrayList<>();
+		for(int i = clusters.size() -1 ; i >= 0; i--) {
+			if(clusters.get(i).size() == 1) {
+				holdouts.add(clusters.remove(i).get(0));
+				centroids.remove(i);
+				clusterTF.remove(i);
+			}
+		}
+		for(int h : holdouts) {
+			List<String> sent = sents.get(h);
+			int simCluster = 0;
+			double clusterSim = overlapSimilarity(sent,centroids.get(0));
+			for(int j = 1; j < clusters.size(); j++) {
+				double newSim = overlapSimilarity(sent,centroids.get(j));
+				if(newSim > clusterSim) {
+					simCluster = j;
+					clusterSim = newSim;
+				}
+			}
+			if(clusterSim < thresh) {
+				simCluster = clusters.size();
+				clusters.add(new ArrayList<Integer>());
+				centroids.add(new ArrayList<String>());
+				clusterTF.add(new HashMap<String,Integer>());
+			}
+			clusters.get(simCluster).add(h);
+			updateCluster(clusters.get(simCluster),centroids.get(simCluster),clusterTF.get(simCluster),sent);			
+		}
+		
 		return clusters;
 	}
+	
+	//it is assumed that the stoplist is a newline delimited list of single words
+	public static Set<String> loadStoplist(String filename) {
+		try {
+			return new HashSet<String>(Files.readAllLines(FileSystems.getDefault().getPath(filename),StandardCharsets.UTF_8));			
+		}
+		catch(Exception e) {
+			return null;
+		}
+	}
+
+	//some of this is extraneous if the passed in strings to program are already somewhat clean
+	public static List<String> sanitize(String sent,Set<String> stoplist){
+		sent = sent.toLowerCase();//drop caps
+		sent = sent.replaceAll("(\\.|!|\\?|\\\"|,)", "");//drop end of sentence (and acronyms)
+		sent = sent.replaceAll("(-|:)"," ");//swap out non whitespace word seperators
+		sent = sent.replaceAll("\\s+", " ").trim();//drop excess whitespace
+		List<String> output = new ArrayList<String>();
+		for(String s : sent.split(" "))//naive segment 
+		{
+			if(stoplist.contains(s)) continue;
+			Stemmer stemmer = new Stemmer();
+			stemmer.add(s.toCharArray(),s.length());
+			stemmer.stem();
+			output.add(stemmer.toString());
+		}
+		return output;
+	}
+
 }

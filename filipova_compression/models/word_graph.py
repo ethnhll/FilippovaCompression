@@ -10,15 +10,19 @@
 #      c) If word node does not exist, create a new a new node for it and an 
 #         edge with weight 1 from the previous node and add the sentence id to 
 #         its seen sentences list
+from filipova_compression.models.node import Node
 
 
 class Word_Graph:
-    def __init__(self, sentence, stop_words=[]):
+    def __init__(self, sentences, stop_words=[]):
         # graph is just a list of nodes
         self.graph = []
         self.start_node = Node()
         self.stop_node = Node()
         self.stop_words = stop_words
+
+        for sentence in sentences:
+            self.add_sentence(sentence)
 
     # TODO(ethan or lizzy): Add first sentence to word graph
 
@@ -27,7 +31,11 @@ class Word_Graph:
         # Sentence is list of pre-tagged words that are represented as named tuples (word, tag)
         previous_node = self.start_node
         for word_info in sentence:
-            current_node = GetWordNode(word_info, previous_node)
+            if word_info.word in self.stop_words:
+                current_node = self.GetStopWordNode(word_info, previous_node)
+            else:
+                current_node = self.GetWordNode(word_info, previous_node)
+            self.graph.append(current_node)
             previous_node = current_node
         pass
         self.stop_node.add_edge(previous_node)
@@ -35,7 +43,8 @@ class Word_Graph:
     # Either
     # (1) Gets the existing word node
     # (2) Adds an additional word node
-    def GetWordNode(word_info, previous_node):
+    def GetWordNode(self, word_info, previous_node):
+        # Check if it is a stopword or not
         for node in self.graph:
             if node.can_map_word(word_info):
                 node.map_word(word_info)
@@ -43,8 +52,11 @@ class Word_Graph:
                 return node
         # If it doesn't exist yet
         new_node = Node(word_info)
-        new_node.add_edge(previous_node)
+        previous_node.add_edge(new_node)
         return new_node
+
+    def GetStopWordNode(self, word_info, previous_node):
+        pass
 
     def Kshortest_path(self, min_sentence_length, k):
         # Use shortest path 
@@ -81,6 +93,8 @@ class Word_Graph:
             new_source = min(unvisited)
             shortest_path(self, new_source,sink,visited,distances,previous_node)
 
-
+    def process_graph(self):
+        self.graph.append(self.start_node)
+        self.graph.append(self.stop_node)
 
 

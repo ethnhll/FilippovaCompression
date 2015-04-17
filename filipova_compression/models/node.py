@@ -46,6 +46,7 @@ class Node:
             if child.can_map_word(next_word):
                 return True
         return False
+
     def map_word(self, word_info, parent):
         self.offset_positions[word_info.sentence_id] = word_info.word_index
         # Should always have a parent node, because if it is the first node,

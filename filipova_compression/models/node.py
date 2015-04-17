@@ -10,6 +10,9 @@ class Node:
             self.offset_positions = {word_info.sentence_id: word_info.word_index}
                 # Children are stored as a dictionary of {node: weight}
         self.edges = defaultdict(int)
+
+    def __eq__(self,other):
+        return self.word == other.word
         
     @property
     def mapped_sentences(self):

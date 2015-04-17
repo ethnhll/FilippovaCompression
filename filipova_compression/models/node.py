@@ -32,6 +32,20 @@ class Node:
             return False
         return True
 
+    def can_map_stopword(self, word_info, previous_node, next_word):
+        if self.word.lower() != word_info.word.lower():
+            return False
+        if self.tag != word_info.tag:
+            return False
+        if word_info.sentence_id in self.mapped_sentences:
+            return False
+        ## One of these conditions needs to be true
+        if self.parents.contains(previous_node):
+            return True
+        for child in self.children:
+            if child.can_map_word(next_word):
+                return True
+        return False
     def map_word(self, word_info, parent):
         self.offset_positions[word_info.sentence_id] = word_info.word_index
         # Should always have a parent node, because if it is the first node,

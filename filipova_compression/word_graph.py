@@ -12,6 +12,7 @@
 #         its seen sentences list
 from node import Node
 from collections import defaultdict
+import networkx as nx
 
 class Word_Graph:
     def __init__(self, sentences, stop_words=[]):
@@ -120,4 +121,14 @@ class Word_Graph:
             print "EDGES"
             for edge in node.edges.keys():
                 print "\t %s   :  %d" %(edge.hash_counter, node.edges[edge])
+        g = self.convert_to_networkx()
+        nx.draw(g)
+        plt.show()
 
+    def convert_to_networkx(self):
+        g = nx.DiGraph()
+        for node in self.graph:
+            g.add_node(node.hash_counter)
+            for edge_node in node.edges.keys():
+                g.add_edge(node.hash_counter, edge_node.hash_counter)
+        return g

@@ -1,9 +1,9 @@
 __author__ = 'Ethan Hill'
-import nltk
+#import nltk
 from collections import namedtuple
-from nltk.tokenize import sent_tokenize, word_tokenize
+#from nltk.tokenize import sent_tokenize, word_tokenize
 
-WordInfo = namedtuple('WordInfo', 'word, tag, sentence_id, index')
+WordInfo = namedtuple('WordInfo', 'word, tag, sentence_id, word_index')
 
 def split_into_sentences(text):
     return [word_tokenize(sentence) for sentence in sent_tokenize(text)]

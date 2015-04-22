@@ -54,7 +54,7 @@ def make_test_sentences():
 	sentence3.append(WordInfo('sat', 'vb', 2, 2))
 	sentence3.append(WordInfo('on', 'prep', 2, 3))
 	sentence3.append(WordInfo('the', 'dt', 2, 4))
-	sentence3.append(WordInfo('mat', 'dt', 2, 5))
+	sentence3.append(WordInfo('mat', 'nn', 2, 5))
 	sentence3.append(WordInfo('and', 'c', 2, 6))
 	sentence3.append(WordInfo('the', 'dt', 2, 7))
 	sentence3.append(WordInfo('other', 'dt', 2, 8))

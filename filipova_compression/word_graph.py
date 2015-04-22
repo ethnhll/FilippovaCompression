@@ -16,7 +16,7 @@ from collections import defaultdict
 class Word_Graph:
     def __init__(self, sentences, stop_words=[]):
         # graph is just a list of nodes
-        self.graph = []
+        self.graph = defaultdict(Node)
         self.start_node = Node(0)
         self.stop_node = Node(1)
         self.counter = 2
@@ -39,7 +39,7 @@ class Word_Graph:
                 current_node = self.GetStopWordNode(word_info, previous_node, next_word)
             else:
                 current_node = self.GetWordNode(word_info, previous_node)
-            self.graph.append(current_node)
+            self.graph[current_node.hash_counter] = current_node
             previous_node = current_node
         pass
         self.stop_node.add_edge(previous_node)
@@ -48,7 +48,7 @@ class Word_Graph:
     # (1) Gets the existing word node
     # (2) Adds an additional word node
     def GetWordNode(self, word_info, previous_node):
-        for node in self.graph:
+        for node in self.graph.values():
             if node.can_map_word(word_info):
                 node.map_word(word_info, previous_node)
                 previous_node.add_edge(node)
@@ -60,7 +60,7 @@ class Word_Graph:
         return new_node
 
     def GetStopWordNode(self, word_info, previous_node, next_word):
-        for node in self.graph:
+        for node in self.graph.values():
             if node.can_map_stopword(word_info, previous_node, next_word):
                 node.map_word(word_info, previous_node)
                 previous_node.add_edge(node)
@@ -107,11 +107,15 @@ class Word_Graph:
             shortest_path(self, new_source,sink,visited,distances,previous_node)
 
     def process_graph(self):
-        self.graph.append(self.start_node)
-        self.graph.append(self.stop_node)
+        self.start_node.word = 'START NODE'
+        self.start_node.tag = ''
+        self.stop_node.word = 'END NODE'
+        self.stop_node.tag = ''
+        self.graph[1] = (self.start_node)
+        self.graph[2] =(self.stop_node)
 
     def print_graph(self):
-        for node in self.graph:
+        for node in self.graph.values():
             print "\nCounter: %d  Word : %s  Tag: %s" %(node.hash_counter, node.word, node.tag)
             print "EDGES"
             for edge in node.edges.keys():

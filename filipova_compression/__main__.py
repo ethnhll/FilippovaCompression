@@ -7,6 +7,7 @@ def main():
     f = open('stoplist')
     stop_words = f.read().split()
     word_graph = Word_Graph(test, stop_words)
+    word_graph.process_graph()
     word_graph.print_graph()
 
 

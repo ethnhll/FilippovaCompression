@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<script type="text/javascript" src="utils/d3.min.js"></script>
+<style>
+body{
+  font: 10px sans-serif;
+}
+div {
+    border-radius: 25px;
+}
+path.link {
+  fill: none;
+  stroke: #333;
+  stroke-width: 1.5px;
+  stroke-opacity: .6;
+}
+
+circle {
+  fill: #ccc;
+  stroke: #fff;
+  stroke-width: 1.5px;
+}
+
+text {
+  fill: #000;
+  font: 10px sans-serif;
+  pointer-events: none;
+  font-weight: bold;
+}
+.Aligner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.graph-box {
+  max-width: 80%;
+  background-color:#f0f0f0
+
+}
+</style>
+<body>
+<center><h1>Word Graph</h1></center>
+<div class="Aligner">
+<div class="graph-box" id="graph-box1">
+<script>
+// get the data
+d3.json("graph.json", function(error, graph) {
+
+var color = d3.scale.category20();
+
+var width = 960,
+    height = 580;
+
+var force = d3.layout.force()
+    .nodes(graph.nodes)
+    .links(graph.links)
+    .size([width, height])
+    .linkDistance(150)
+    .charge(-500)
+    .on("tick", tick)
+    .start();
+
+var svg = d3.select("#graph-box1").append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+// build the arrow.
+svg.append("svg:defs").selectAll("marker")
+    .data(["end"])      // Different link/path types can be defined here
+  .enter().append("svg:marker")    // This section adds in the arrows
+    .attr("id", String)
+    .attr("viewBox", "0 -5 10 10")
+    .attr("refX", 28)
+    .attr("refY", -1.5)
+    .attr("markerWidth", 6)
+    .attr("markerHeight", 6)
+	.attr("markerUnits","userSpaceOnUse")
+    .attr("orient", "auto")
+  .append("svg:path")
+    .attr("d", "M0,-5L10,0L0,5");
+
+// add the links and the arrows
+var path = svg.append("svg:g").selectAll("path")
+    .data(force.links())
+  .enter().append("svg:path")
+    .attr("class", "link")
+    .attr("marker-end", "url(#end)")
+	.style("stroke-width", function(d) { return Math.sqrt(2*d.weight); });
+
+// define the nodes
+var node = svg.selectAll(".node")
+    .data(force.nodes())
+  .enter().append("g")
+    .attr("class", "node")
+    .call(force.drag);
+
+// add the nodes
+node.append("circle")
+    .attr("r", 10)
+	.style("fill", function(d) { return color(d.id); });
+	
+node.append("title")
+    .text(function(d) { return d.id+": ("+d.word+", "+d.tag+")"; });
+	
+path.append("title")
+    .text(function(d) { return d.weight; });
+
+// add the text 
+node.append("text")
+    .attr("text-anchor", "middle")
+    .attr("fill", "#080808")
+	.attr("font-weight", "bold")
+	.attr("dy", ".4em")
+    .text(function(d) { return d.id; });
+
+// add the curvy lines
+function tick() {
+    path.attr("d", function(d) {
+        var dx = d.target.x - d.source.x,
+            dy = d.target.y - d.source.y,
+            dr = Math.sqrt(dx * dx + dy * dy);
+        return "M" + 
+            d.source.x + "," + 
+            d.source.y + "A" + 
+            dr + "," + dr + " 0 0,1 " + 
+            d.target.x + "," + 
+            d.target.y;
+    });
+
+    node
+        .attr("transform", function(d) { 
+  	    return "translate(" + d.x + "," + d.y + ")"; });
+}
+
+});
+
+</script>
+</body>
+</html>

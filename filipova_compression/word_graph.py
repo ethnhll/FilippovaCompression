@@ -12,7 +12,10 @@
 #         its seen sentences list
 from node import Node
 from collections import defaultdict
-#import networkx as nx
+import networkx as nx
+from networkx.readwrite import json_graph
+import json
+
 
 class Word_Graph:
     def __init__(self, sentences, stop_words=[]):
@@ -116,19 +119,25 @@ class Word_Graph:
         self.graph[1] =(self.stop_node)
 
     def print_graph(self):
-        for node in self.graph.values():
-            print "\nCounter: %d  Word : %s  Tag: %s" %(node.hash_counter, node.word, node.tag)
-            print "EDGES"
-            for edge in node.edges.keys():
-                print "\t %s   :  %d" %(edge.hash_counter, node.edges[edge])
-    #    g = self.convert_to_networkx()
-    #    nx.draw(g)
-    #    plt.show()
+##        for node in self.graph.values():
+##            print "\nCounter: %d  Word : %s  Tag: %s" %(node.hash_counter, node.word, node.tag)
+##            print "EDGES"
+##            for edge in node.edges.keys():
+##                print "\t %s   :  %d" %(edge.hash_counter, node.edges[edge])
+        g = self.convert_to_networkx()
+        d = json_graph.node_link_data(g)
+        json.dump(d,open('graph.json','w'))
+##        nx.draw_circular(g,with_labels=True)
+##        plt.show()
 
     def convert_to_networkx(self):
         g = nx.DiGraph()
-        for node in self.graph:
-            g.add_node(node.hash_counter)
-            for edge_node in node.edges.keys():
-                g.add_edge(node.hash_counter, edge_node.hash_counter)
+        g.add_nodes_from(self.graph.keys())
+        for ID, node in self.graph.items():
+            g.node[ID]['word'] = node.word
+            g.node[ID]['tag'] = node.tag
+            
+            for edge_node,weight in node.edges.items():
+                g.add_edge(node.hash_counter, edge_node.hash_counter,weight=weight)
+                
         return g

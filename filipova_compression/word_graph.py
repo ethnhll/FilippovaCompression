@@ -12,7 +12,7 @@
 #         its seen sentences list
 from node import Node
 from collections import defaultdict
-import networkx as nx
+#import networkx as nx
 
 class Word_Graph:
     def __init__(self, sentences, stop_words=[]):
@@ -43,7 +43,7 @@ class Word_Graph:
             self.graph[current_node.hash_counter] = current_node
             previous_node = current_node
         pass
-        self.stop_node.add_edge(previous_node)
+        previous_node.add_edge(self.stop_node)
 
     # Either
     # (1) Gets the existing word node
@@ -108,12 +108,12 @@ class Word_Graph:
             shortest_path(self, new_source,sink,visited,distances,previous_node)
 
     def process_graph(self):
-        self.start_node.word = 'START NODE'
+        self.start_node.word = '<s>'
         self.start_node.tag = ''
-        self.stop_node.word = 'END NODE'
+        self.stop_node.word = '</s>'
         self.stop_node.tag = ''
-        self.graph[1] = (self.start_node)
-        self.graph[2] =(self.stop_node)
+        self.graph[0] = (self.start_node)
+        self.graph[1] =(self.stop_node)
 
     def print_graph(self):
         for node in self.graph.values():
@@ -121,9 +121,9 @@ class Word_Graph:
             print "EDGES"
             for edge in node.edges.keys():
                 print "\t %s   :  %d" %(edge.hash_counter, node.edges[edge])
-        g = self.convert_to_networkx()
-        nx.draw(g)
-        plt.show()
+    #    g = self.convert_to_networkx()
+    #    nx.draw(g)
+    #    plt.show()
 
     def convert_to_networkx(self):
         g = nx.DiGraph()

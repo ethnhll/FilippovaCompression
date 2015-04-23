@@ -14,7 +14,7 @@ class Node:
         self.parents = {parent} if parent else set()
 
     def __eq__(self,other):
-        return self.hash_counter == other.hash_counter
+        return self.hash_counter == other.hash_countier
         
     def __hash__(self):
         return self.hash_counter

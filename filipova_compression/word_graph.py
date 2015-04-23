@@ -75,40 +75,103 @@ class Word_Graph:
         previous_node.add_edge(new_node)
         return new_node
 
-    def Kshortest_path(self, min_sentence_length, k):
+    def Kshortest_path(self, min_length, K):
+        paths=[]
+        distances = []
         # Use shortest path 
-         pass
+        path, distance = self.shortest_path('<s>','</s>')
+        distances.append(distance)
+        paths.append(path)
+        potential_paths = []
+        for k in range(K-1):
+            for i in range(len(paths[k])-1):
+                edges_removed=[]
+                spur_node = paths[k][i]
+                root_path = paths[k][:i+1]
+                for path in paths:
+                    if root_path == path[:i+1]:
+                        edges_removed.append((path[i],path[i+1],self.pop_edge(path[i],path[i+1])))
+                for node in root_path:
+                    if node != spur_node:
+                        # cut out edges out of the node (effectively removing it)
+                        for word in self.graph.keys():
+                            edges_removed.append((node,word,self.pop_edge(node,word)))
 
-    def shortest_path(self, source, sink, visited=[], distances=defaultdict(int), previous_node=defaultdict(Node)):
+                spur_path, distance = self.shortest_path(spur_node,'</s>')
+                self.add_group_edges(edges_removed)
+                if spur_path!=None:
+                    root_distance=0
+                    for i  in range(len(root_path)-1):
+                        root_distance+=self.graph[root_path[i]].edges[root_path[i+1]]
+                    if root_path:
+                        root_distance+=self.graph[root_path[-1]].edges[spur_path[0]]
+                    final_path = root_path[:-1] + spur_path
+                    potential_paths.append((final_path,distance+root_distance))
+            if not potential_paths:
+                break
+            potential_paths.sort(key=lambda x: x[1])
+            print('print potential paths')
+            print(potential_paths[:3])
+            while(potential_paths[0][0] in paths):
+                potential_paths.pop(0)
+            paths.append(potential_paths[0][0])
+            distances.append(potential_paths[0][1])
+            potential_paths.pop(0)
+        #print(potential_paths)
+        final_paths = list(zip(paths,distances))
+        for path in final_paths:
+            if len(path[0])<min_length:
+                final_paths.remove(path)
+
+        return final_paths
+
+
+    def shortest_path(self, source, sink, visited=None, distances=None, previous_node=None):
+        if visited==None:
+            visited=[]
+            distances=defaultdict(int)
+            previous_node=defaultdict(Node)
+
         # if we reach the end build the path from previous_node
         if sink==source:
-            path = []
+            path=[]
             previous = sink
             while previous != None:
-                path.append(previous)
+                path.insert(0,previous)
                 previous = previous_node.get(previous,None)
             distance = distances[sink]
+            return path, distance
         else:
             # If we are in the initial run initialize distance
             if not visited:
                 distances[source] = 0
             # Go through the edges going out of the node if it's not visited
             # check whether it's the shortest way to reach the node
-            for node in source.edges:
+            for node in self.graph[source].edges:
                 if node not in visited:
-                    distance = distances[source] + source.edges[node]
+                    distance = distances[source] + self.graph[source].edges[node]
                     if distance < distances.get(node,float('inf')):
                         distances[node] = distance
-                        previous[node] = source
+                        previous_node[node] = source
             visited.append(source)
             # Call the function recursively to the node with the lowest distance
             # that has been touch (not visited)
-            univisited={}
-            for node in self.graph:
-                if node not in visited:
-                    unvisited[node] = distance.get(node,float('inf'))
-            new_source = min(unvisited)
-            shortest_path(self, new_source,sink,visited,distances,previous_node)
+            adjacent_nodes=[]
+            for node in visited:
+                for adjacent_node in self.graph[node].edges.keys():
+                    if adjacent_node not in visited:
+                        adjacent_nodes.append(adjacent_node)
+
+            if adjacent_nodes:
+                unvisited={}
+                for node in self.graph:
+                    if node not in visited:
+                        unvisited[node] = distances.get(node,float('inf'))
+                new_source = min(unvisited,key=unvisited.get)
+                path, distance = self.shortest_path(new_source,sink,visited,distances,previous_node)
+                return path, distance
+            else:
+                return None, float('inf')
 
     def process_graph(self):
         self.start_node.word = '<s>'

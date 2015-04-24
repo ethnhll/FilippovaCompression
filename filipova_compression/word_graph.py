@@ -23,7 +23,7 @@ class Word_Graph:
         self.stop_node = Node(1)
         self.counter = 2
         self.stop_words = stop_words
-
+        self.word_frequency = defaultdict(int)
         for sentence in sentences:
             self.add_sentence(sentence)
 
@@ -43,6 +43,7 @@ class Word_Graph:
                 current_node = self.GetWordNode(word_info, previous_node)
             self.graph[current_node.hash_counter] = current_node
             previous_node = current_node
+            self.word_frequency[word_info.word] += 1
         pass
         previous_node.add_edge(self.stop_node)
 
@@ -77,6 +78,18 @@ class Word_Graph:
         for node in self.graph.values():
             for node2, edge in node.edges.items():
                 node.edges[node2] = 1/edge
+    def weight_edges_with_strong_links(self):
+        for node in self.graph.values():
+            for node2, edge in node.edges.items():
+                weight = self.word_frequency[node.word] + self.word_frequency[node2.word]
+                node.edges[node2] = weight/edge
+
+    def reweight_edges(self, weighting_type):
+        if (weighting_type=='baseline'):
+            self.invert_weights()
+            return
+        if (weighting_type=='strong_links'):
+            self.weight_edges_with_strong_links()
 
     def add_group_edges(self, edges_removed):
         for edge in edges_removed:
@@ -133,7 +146,7 @@ class Word_Graph:
             potential_paths.pop(0)
         #print(potential_paths)
         final_paths = list(zip(paths,distances))
-        print(str(final_paths))
+        #print(str(final_paths))
         i=0
         while i<len(final_paths):
             if len(final_paths[i][0])<min_length:
@@ -223,7 +236,7 @@ class Word_Graph:
 
     def contains_verb(self, path):
         for id in path:
-            print(self.graph[id].tag[:2])
+            # print(self.graph[id].tag[:2])
             if self.graph[id].tag[:2].upper() == 'VB':
                 return True
         return False

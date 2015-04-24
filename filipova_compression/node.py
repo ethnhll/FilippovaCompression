@@ -4,12 +4,13 @@ from collections import defaultdict
 class Node:
     # Represents a node on the word graph
     def __init__(self, node_count = 0, word_info=None, parent=None):
+        self.offset_positions ={}
         if word_info is not None:
             self.word = word_info.word
             self.tag = word_info.tag
             self.offset_positions = {word_info.sentence_id: word_info.word_index}
                 # Children are stored as a dictionary of {node: weight}
-        self.offset_positions ={}
+        
         self.hash_counter = node_count
         self.edges = defaultdict(int)
         self.parents = {parent} if parent else set()

@@ -8,6 +8,8 @@ def main():
     stop_words = f.read().split()
     word_graph = Word_Graph(test, stop_words)
     word_graph.process_graph()
+    word_graph.invert_weights()
+    print(str(word_graph.Kshortest_path(5,3)))
     word_graph.print_graph()
 
 

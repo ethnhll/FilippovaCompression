@@ -75,11 +75,27 @@ class Word_Graph:
         previous_node.add_edge(new_node)
         return new_node
 
+    def invert_weights(self):
+        for node in self.graph.values():
+            for node2, edge in node.edges.items():
+                node.edges[node2] = 1/edge
+
+    def add_group_edges(self, edges_removed):
+        for edge in edges_removed:
+            if edge[2]!=None:
+                self.add_edge(edge[0],self.graph[edge[1]],edge[2])
+
+    def add_edge(self,source,target,weight):
+        self.graph[source].add_new_edge(target,weight)
+
+    def pop_edge(self,source,target):
+        return self.graph[source].remove_edge(self.graph[target])
+
     def Kshortest_path(self, min_length, K):
         paths=[]
         distances = []
         # Use shortest path 
-        path, distance = self.shortest_path('<s>','</s>')
+        path, distance = self.shortest_path(0,1)
         distances.append(distance)
         paths.append(path)
         potential_paths = []
@@ -94,24 +110,24 @@ class Word_Graph:
                 for node in root_path:
                     if node != spur_node:
                         # cut out edges out of the node (effectively removing it)
-                        for word in self.graph.keys():
-                            edges_removed.append((node,word,self.pop_edge(node,word)))
+                        for ID in self.graph.keys():
+                            edges_removed.append((node,ID,self.pop_edge(node,ID)))
 
-                spur_path, distance = self.shortest_path(spur_node,'</s>')
+                spur_path, distance = self.shortest_path(spur_node,1)
                 self.add_group_edges(edges_removed)
                 if spur_path!=None:
                     root_distance=0
                     for i  in range(len(root_path)-1):
-                        root_distance+=self.graph[root_path[i]].edges[root_path[i+1]]
+                        root_distance+=self.graph[root_path[i]].edges[self.graph[root_path[i+1]]]
                     if root_path:
-                        root_distance+=self.graph[root_path[-1]].edges[spur_path[0]]
+                        root_distance+=self.graph[root_path[-1]].edges[self.graph[spur_path[0]]]
                     final_path = root_path[:-1] + spur_path
                     potential_paths.append((final_path,distance+root_distance))
             if not potential_paths:
                 break
             potential_paths.sort(key=lambda x: x[1])
-            print('print potential paths')
-            print(potential_paths[:3])
+            #print('print potential paths')
+            #print(potential_paths[:3])
             while(potential_paths[0][0] in paths):
                 potential_paths.pop(0)
             paths.append(potential_paths[0][0])
@@ -119,10 +135,15 @@ class Word_Graph:
             potential_paths.pop(0)
         #print(potential_paths)
         final_paths = list(zip(paths,distances))
-        for path in final_paths:
-            if len(path[0])<min_length:
-                final_paths.remove(path)
-
+        print(str(final_paths))
+        i=0
+        while i<len(final_paths):
+            if len(final_paths[i][0])<min_length:
+                final_paths.remove(final_paths[i])
+            else:
+                i+=1
+        for i in range(len(final_paths[0][0])-1):
+            self.graph[final_paths[0][0][i]].shortest=final_paths[0][0][i+1]
         return final_paths
 
 
@@ -147,26 +168,26 @@ class Word_Graph:
                 distances[source] = 0
             # Go through the edges going out of the node if it's not visited
             # check whether it's the shortest way to reach the node
-            for node in self.graph[source].edges:
-                if node not in visited:
+            for node in self.graph[source].edges.keys():
+                if node.hash_counter not in visited:
                     distance = distances[source] + self.graph[source].edges[node]
-                    if distance < distances.get(node, float('inf')):
-                        distances[node] = distance
-                        previous_node[node] = source
+                    if distance < distances.get(node.hash_counter,float('inf')):
+                        distances[node.hash_counter] = distance
+                        previous_node[node.hash_counter] = source
             visited.append(source)
             # Call the function recursively to the node with the lowest distance
             # that has been touch (not visited)
             adjacent_nodes=[]
             for node in visited:
                 for adjacent_node in self.graph[node].edges.keys():
-                    if adjacent_node not in visited:
-                        adjacent_nodes.append(adjacent_node)
+                    if adjacent_node.hash_counter not in visited:
+                        adjacent_nodes.append(adjacent_node.hash_counter)
 
             if adjacent_nodes:
                 unvisited={}
-                for node in self.graph:
+                for node in self.graph.keys():
                     if node not in visited:
-                        unvisited[node] = distances.get(node,float('inf'))
+                        unvisited[node] = distances.get(self.graph[node].hash_counter,float('inf'))
                 new_source = min(unvisited,key=unvisited.get)
                 path, distance = self.shortest_path(new_source,sink,visited,distances,previous_node)
                 return path, distance
@@ -190,8 +211,6 @@ class Word_Graph:
         g = self.convert_to_networkx()
         d = json_graph.node_link_data(g)
         json.dump(d,open('graph.json','w'))
-##        nx.draw_circular(g,with_labels=True)
-##        plt.show()
 
     def convert_to_networkx(self):
         g = nx.DiGraph()
@@ -199,6 +218,7 @@ class Word_Graph:
         for ID, node in self.graph.items():
             g.node[ID]['word'] = node.word
             g.node[ID]['tag'] = node.tag
+            g.node[ID]['shortest'] = node.shortest
             g.node[ID]['sentences'] = str(node.offset_positions)
             
             for edge_node,weight in node.edges.items():

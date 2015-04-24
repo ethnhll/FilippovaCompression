@@ -96,7 +96,6 @@
     </div>
    <center> Speech And Language Recognition, Final Project, Group 6</center>
 <script>
-var test_path = [0,2,3,4,5,6,7,8,9,1]
 // get the data
 d3.json("graph.json", function(error, graph) {
 
@@ -140,14 +139,14 @@ var path = svg.append("svg:g").selectAll("path")
     .attr("class", "link")
     .attr("marker-end", "url(#end)")
     .attr("stroke", function (d) {
-        if (test_path.indexOf(d.source.id) == test_path.indexOf(d.target.id)-1) {
+        if (d.source.shortest == d.target.id) {
             return "#33CC33";
         }
         else {
             return "#000";
         }
     })
-	.style("stroke-width", function(d) { return Math.sqrt(2*d.weight); });
+	.style("stroke-width", function(d) { return 1/d.weight; });
 
 // define the nodes
 var node = svg.selectAll(".node")
@@ -164,7 +163,7 @@ node.append("circle")
 	.style("fill", function (d) {
 	    if (d.id == 1) { return "#00478F"; }
 	    else if (d.id == 0) { return "#1F7A1F";}
-	    else if (test_path.indexOf(d.id) >= 0) { return "#B20000"; }
+	    else if (d.shortest >= 0) { return "#B20000"; }
 	    else { return "#D5D5D5"; }
 	});
 	
@@ -178,7 +177,7 @@ path.append("title")
 node.append("text")
     .attr("text-anchor", "middle")
     .attr("fill", function (d) {
-        if (test_path.indexOf(d.id) >= 0) { return "#F8F8F8";}
+        if (d.shortest >= 0||d.id==1) { return "#F8F8F8";}
         else {return "#080808";}
     })
 	.attr("font-weight", "bold")
@@ -228,14 +227,14 @@ function dblclick(d) {
 	        .style("fill", function (d) {
 	            if (d.id == 1) { return "#00478F"; }
 	            else if (d.id == 0) { return "#1F7A1F"; }
-	            else if (test_path.indexOf(d.id) >= 0) { return "#B20000"; }
+	            else if (d.shortest >= 0) { return "#B20000"; }
 	            else { return "#D5D5D5"; }
 	        });
         d3.select(this).select("text").transition()
             .duration(750)
             .attr("x", 0)
             .style("fill", function (d) {
-                if (test_path.indexOf(d.id) >= 0) { return "#F8F8F8"; }
+                if (d.shortest >= 0||d.id==1) { return "#F8F8F8"; }
                 else { return "#080808"; }
             })
             .text(function (d) { return d.id; });

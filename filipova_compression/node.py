@@ -12,7 +12,8 @@ class Node:
                 # Children are stored as a dictionary of {node: weight}
         
         self.hash_counter = node_count
-        self.edges = defaultdict(int)
+        self.edges = defaultdict(float)
+        self.shortest=-1
         self.parents = {parent} if parent else set()
 
     def __eq__(self,other):
@@ -62,3 +63,10 @@ class Node:
     # Adds an edge from the previous word in the sentence
     def add_edge(self, node):
         self.edges[node] = self.edges[node] + 1
+	
+    def remove_edge(self,node):
+        return self.edges.pop(node,None)
+	
+    def add_new_edge(self, node,weigth):
+        self.edges[node] = weigth
+

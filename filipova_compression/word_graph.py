@@ -12,8 +12,6 @@
 #         its seen sentences list
 from node import Node
 from collections import defaultdict
-import networkx as nx
-from networkx.readwrite import json_graph
 import json
 
 
@@ -211,23 +209,17 @@ class Word_Graph:
 ##            print "EDGES"
 ##            for edge in node.edges.keys():
 ##                print "\t %s   :  %d" %(edge.hash_counter, node.edges[edge])
-        g = self.convert_to_networkx()
-        d = json_graph.node_link_data(g)
-        json.dump(d,open('graph.json','w'))
-
-    def convert_to_networkx(self):
-        g = nx.DiGraph()
-        g.add_nodes_from(self.graph.keys())
+        g={'graph': [], 'multigraph': False, 'directed': True, 'nodes':[{} for i in self.graph],'links':[]}
         for ID, node in self.graph.items():
-            g.node[ID]['word'] = node.word
-            g.node[ID]['tag'] = node.tag
-            g.node[ID]['shortest'] = node.shortest
-            g.node[ID]['sentences'] = str(node.offset_positions)
-            
+            g["nodes"][ID]['id']=node.hash_counter
+            g["nodes"][ID]['word'] = node.word
+            g["nodes"][ID]['tag'] = node.tag
+            g["nodes"][ID]['shortest'] = node.shortest
+            g["nodes"][ID]['sentences'] = str(node.offset_positions)
             for edge_node,weight in node.edges.items():
-                g.add_edge(node.hash_counter, edge_node.hash_counter,weight=weight)
-                
-        return g
+                 g["links"].append({"source": node.hash_counter, "target": edge_node.hash_counter, "weight": weight})
+
+        json.dump(g,open('graph.json','w'))
 
     def contains_verb(self, path):
         for id in path:

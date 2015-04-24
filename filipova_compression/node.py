@@ -63,10 +63,10 @@ class Node:
     # Adds an edge from the previous word in the sentence
     def add_edge(self, node):
         self.edges[node] = self.edges[node] + 1
-	
+
     def remove_edge(self,node):
         return self.edges.pop(node,None)
-	
+
     def add_new_edge(self, node,weigth):
         self.edges[node] = weigth
 

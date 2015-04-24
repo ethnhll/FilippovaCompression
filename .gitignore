@@ -1,2 +1,5 @@
 .idea/
 *.pyc
+*.suo
+filipova_compression/filipova_compression.pyproj
+*.sln

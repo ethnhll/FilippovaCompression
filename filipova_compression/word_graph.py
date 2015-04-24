@@ -140,10 +140,13 @@ class Word_Graph:
         while i<len(final_paths):
             if len(final_paths[i][0])<min_length:
                 final_paths.remove(final_paths[i])
+            elif not self.contains_verb(final_paths[i][0]):
+                final_paths.remove(final_paths[i])
             else:
                 i+=1
-        for i in range(len(final_paths[0][0])-1):
-            self.graph[final_paths[0][0][i]].shortest=final_paths[0][0][i+1]
+        if final_paths:
+            for i in range(len(final_paths[0][0])-1):
+                self.graph[final_paths[0][0][i]].shortest=final_paths[0][0][i+1]
         return final_paths
 
 
@@ -225,3 +228,10 @@ class Word_Graph:
                 g.add_edge(node.hash_counter, edge_node.hash_counter,weight=weight)
                 
         return g
+
+    def contains_verb(self, path):
+        for id in path:
+            print(self.graph[id].tag[:2])
+            if self.graph[id].tag[:2].upper() == 'VB':
+                return True
+        return False

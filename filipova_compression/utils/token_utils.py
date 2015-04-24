@@ -1,3 +1,5 @@
+import subprocess
+
 __author__ = 'Ethan Hill'
 import nltk
 from collections import namedtuple
@@ -5,15 +7,25 @@ from nltk.tokenize import sent_tokenize, word_tokenize
 
 WordInfo = namedtuple('WordInfo', 'word, tag, sentence_id, index')
 
+
 def split_into_sentences(text):
     return [word_tokenize(sentence) for sentence in sent_tokenize(text)]
+
+
+def cluster_sentences(sentence_file):
+    print 'test'
+    output = subprocess.check_output(
+        'java', 'SimClusterMain.java', sentence_file)
+    print output
+    return output
 
 
 def prepare_word_info(text):
     token_sentences = []
     for sentence_id, sentence in enumerate(split_into_sentences(text)):
         words = []
-        for word_index, word_tag in enumerate(nltk.pos_tag(sentence)):
+        # Start the index at 1, we will use 0 index for start symbol
+        for word_index, word_tag in enumerate(nltk.pos_tag(sentence), start=1):
             word, tag = word_tag
             words.append(WordInfo(word, tag, sentence_id, word_index))
         token_sentences.append(words)
@@ -76,3 +88,6 @@ def make_test_sentences():
 	token_sentences.append(sentence4)
 
 	return token_sentences
+
+if __name__ == '__main__':
+    cluster_sentences('test.txt')

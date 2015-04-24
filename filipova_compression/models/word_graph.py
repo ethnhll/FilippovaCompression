@@ -1,20 +1,22 @@
 ﻿# General Algorithm
-# 1) Add a start node, followed by a linear path of the words in 
+# 1) Add a start node, followed by a linear path of the words in
 # the first sentence as nodes, and an end node
 # 2) For each word in additional sentences:
 #      a) If stopword, include it only if there is some overlapping
-#		  in non-stopword neighbors 
+#		  in non-stopword neighbors
 #      b) If (word, tag) node exists in graph and no part of that
-#         sentence has already been mapped to node, add 1 to weight 
+#         sentence has already been mapped to node, add 1 to weight
 #         of edge and add the sentence id to the nodeâs list of seen sentences
-#      c) If word node does not exist, create a new a new node for it and an 
-#         edge with weight 1 from the previous node and add the sentence id to 
+#      c) If word node does not exist, create a new a new node for it and an
+#         edge with weight 1 from the previous node and add the sentence id to
 #         its seen sentences list
 from filipova_compression.models.node import Node
 
 
-class Word_Graph:
+class WordGraph:
     def __init__(self, sentences, stop_words=[]):
+        self.__graph_matrix = {}
+
         # graph is just a list of nodes
         self.graph = []
         self.start_node = Node()
@@ -23,6 +25,14 @@ class Word_Graph:
 
         for sentence in sentences:
             self.add_sentence(sentence)
+
+    @property
+    def vertices(self):
+        return set(self.__graph_matrix.keys())
+
+    @property
+    def edges(self):
+        return
 
     # TODO(ethan or lizzy): Add first sentence to word graph
 
@@ -69,7 +79,7 @@ class Word_Graph:
         return new_node
 
     def Kshortest_path(self, min_sentence_length, k):
-        # Use shortest path 
+        # Use shortest path
          pass
 
     def shortest_path(self, source, sink, visited=[], distances=defaultdict(int), previous_node=defaultdict(Node)):

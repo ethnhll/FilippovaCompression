@@ -150,7 +150,7 @@ class Word_Graph:
             for node in self.graph[source].edges:
                 if node not in visited:
                     distance = distances[source] + self.graph[source].edges[node]
-                    if distance < distances.get(node,float('inf')):
+                    if distance < distances.get(node, float('inf')):
                         distances[node] = distance
                         previous_node[node] = source
             visited.append(source)

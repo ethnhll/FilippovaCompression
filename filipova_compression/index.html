@@ -1,54 +1,108 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <meta charset="utf-8">
 <script type="text/javascript" src="utils/d3.min.js"></script>
 <style>
-body{
-  font: 10px sans-serif;
-}
-div {
-    border-radius: 25px;
-}
-path.link {
-  fill: none;
-  stroke: #333;
-  stroke-width: 1.5px;
-  stroke-opacity: .6;
-}
+    body {
+        font: 10px sans-serif;
+    }
+    div {
+        border-radius: 25px;
+    }
+    path.link {
+        fill: none;
+        /*stroke: #333;*/
+        stroke-width: 1.5px;
+        stroke-opacity: .6;
+    }
 
-circle {
-  fill: #ccc;
-  stroke: #fff;
-  stroke-width: 1.5px;
-}
+    circle {
+        fill: #ccc;
+        stroke: #fff;
+        stroke-width: 1.5px;
+    }
 
-text {
-  fill: #000;
-  font: 10px sans-serif;
-  pointer-events: none;
-  font-weight: bold;
-}
-.Aligner {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.graph-box {
-  max-width: 80%;
-  background-color:#f0f0f0
+    text {
+        font: 10px sans-serif;
+        pointer-events: none;
+        font-weight: bold;
+    }
+    .Aligner {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .Aligner2 {
+        /*display: flex;*/
+        align-items: center;
+        justify-content: center;
+        float:left;
+    }
+    .Aligner3 {
+        width:900px;
+        align-items: center;
+        justify-content: center;
+    }
+    .graph-box {
+        max-width: 95%;
+        padding: 7px;
+        background-color: #f0f0f0;
+        font-weight: bold;
+        vertical-align: bottom;
+    }
+    .toolbar {
+        width: 100px;
+        height:145px;
+        padding: 7px;
+        background-color: #555;
+        font-weight: bold;
+        align-items:center;
+    }
+    .legend {
+        width: 80px;
+        padding: 7px;
+        font-weight: bold;
+        text-align: center;
+        align-self:center;
+        margin-left:3px;
+        margin-right:2px;
+        margin-top:5px;
+        margin-bottom:5px;
 
-}
+    }
+    .title {
+        width: 380px;
+        padding: 7px;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom:10px;
+    }
 </style>
 <body>
-<center><h1>Word Graph</h1></center>
+<center><div class="title" style="background-color: #FFD633"><h1>Summary Word Graph</h1></div></center>
 <div class="Aligner">
-<div class="graph-box" id="graph-box1">
+    <div class="Aligner2">
+        <div class="toolbar">
+<center>Legend</center></font>
+            <div class="Aligner2">
+                <div class="legend" style="background-color: #1F7A1F"><font color="#F8F8F8">Start Node</font></div>
+                <div class="legend" style="background-color: #00478F"><font color="#F8F8F8">Finish Node</font></div>
+                <div class="legend" style="background-color: #B20000"><font color="#F8F8F8">Shortest</font></div>
+                <font color="#F8F8F8"><center>Double click the nodes to expand!</center></font>
+            </div>
+        </div>
+    </div>
+<div class="Aligner" >
+        <div class="graph-box" id="graph-box1"></div></div>
+    </div>
+   <center> Speech And Language Recognition, Final Project, Group 6</center>
 <script>
+var test_path = [0,2,3,4,5,6,7,8,9,1]
 // get the data
 d3.json("graph.json", function(error, graph) {
 
 var color = d3.scale.category20();
 
-var width = 960,
+var width = 1000,
     height = 580;
 
 var force = d3.layout.force()
@@ -85,6 +139,14 @@ var path = svg.append("svg:g").selectAll("path")
   .enter().append("svg:path")
     .attr("class", "link")
     .attr("marker-end", "url(#end)")
+    .attr("stroke", function (d) {
+        if (test_path.indexOf(d.source.id) == test_path.indexOf(d.target.id)-1) {
+            return "#33CC33";
+        }
+        else {
+            return "#000";
+        }
+    })
 	.style("stroke-width", function(d) { return Math.sqrt(2*d.weight); });
 
 // define the nodes
@@ -92,15 +154,22 @@ var node = svg.selectAll(".node")
     .data(force.nodes())
   .enter().append("g")
     .attr("class", "node")
-    .call(force.drag);
+    .call(force.drag)
+    //.on("click", click)
+    .on("dblclick", dblclick);
 
 // add the nodes
 node.append("circle")
     .attr("r", 10)
-	.style("fill", function(d) { return color(d.id); });
+	.style("fill", function (d) {
+	    if (d.id == 1) { return "#00478F"; }
+	    else if (d.id == 0) { return "#1F7A1F";}
+	    else if (test_path.indexOf(d.id) >= 0) { return "#B20000"; }
+	    else { return "#D5D5D5"; }
+	});
 	
 node.append("title")
-    .text(function(d) { return d.id+": ("+d.word+", "+d.tag+")"; });
+    .text(function(d) { return d.id+": ("+d.word+", "+d.tag+")\n Sentences:"+d.sentences; });
 	
 path.append("title")
     .text(function(d) { return d.weight; });
@@ -108,7 +177,10 @@ path.append("title")
 // add the text 
 node.append("text")
     .attr("text-anchor", "middle")
-    .attr("fill", "#080808")
+    .attr("fill", function (d) {
+        if (test_path.indexOf(d.id) >= 0) { return "#F8F8F8";}
+        else {return "#080808";}
+    })
 	.attr("font-weight", "bold")
 	.attr("dy", ".4em")
     .text(function(d) { return d.id; });
@@ -132,7 +204,57 @@ function tick() {
   	    return "translate(" + d.x + "," + d.y + ")"; });
 }
 
-});
+});/*
+function click() {
+    d3.select(this).select("text").transition()
+        .duration(750)
+        .attr("x", 22)
+        .style("fill", "#000")
+        .style("stroke", "#fff")
+        .style("font", "15px sans-serif bold")
+        .text(function (d) { return d.id + ": (" + d.word + ", " + d.tag + ")\n Sentences:" + d.sentences; });;
+    d3.select(this).select("circle").transition()
+        .duration(750)
+        .attr("r", 13)
+        .style("fill", "#FFCC00");
+}*/
+
+// action to take on mouse double click
+function dblclick(d) {
+    if (d3.select(this).select("circle").attr("r") != 10) {
+        d3.select(this).select("circle").transition()
+            .duration(750)
+            .attr("r", 10)
+	        .style("fill", function (d) {
+	            if (d.id == 1) { return "#00478F"; }
+	            else if (d.id == 0) { return "#1F7A1F"; }
+	            else if (test_path.indexOf(d.id) >= 0) { return "#B20000"; }
+	            else { return "#D5D5D5"; }
+	        });
+        d3.select(this).select("text").transition()
+            .duration(750)
+            .attr("x", 0)
+            .style("fill", function (d) {
+                if (test_path.indexOf(d.id) >= 0) { return "#F8F8F8"; }
+                else { return "#080808"; }
+            })
+            .text(function (d) { return d.id; });
+    }
+    else {
+        var str = d.word + ", " + d.tag;
+        d3.select(this).select("text").transition()
+        .duration(750)
+        .attr("x", str.length*2+18)
+        .style("fill", "#000")
+        .style("fill", "#000")
+        .text(function (d) { return str; });
+        d3.select(this).select("circle").transition()
+            .duration(750)
+            .attr("r", 13)
+            .style("fill", "#FFCC00");
+    }
+}
+
 
 </script>
 </body>

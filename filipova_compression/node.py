@@ -9,6 +9,7 @@ class Node:
             self.tag = word_info.tag
             self.offset_positions = {word_info.sentence_id: word_info.word_index}
                 # Children are stored as a dictionary of {node: weight}
+        self.offset_positions ={}
         self.hash_counter = node_count
         self.edges = defaultdict(int)
         self.parents = {parent} if parent else set()

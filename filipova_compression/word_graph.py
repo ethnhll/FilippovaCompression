@@ -199,6 +199,7 @@ class Word_Graph:
         for ID, node in self.graph.items():
             g.node[ID]['word'] = node.word
             g.node[ID]['tag'] = node.tag
+            g.node[ID]['sentences'] = str(node.offset_positions)
             
             for edge_node,weight in node.edges.items():
                 g.add_edge(node.hash_counter, edge_node.hash_counter,weight=weight)

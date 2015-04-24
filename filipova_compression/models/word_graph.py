@@ -32,7 +32,7 @@ class WordGraph:
 
     @property
     def edges(self):
-        return
+
 
     # TODO(ethan or lizzy): Add first sentence to word graph
 

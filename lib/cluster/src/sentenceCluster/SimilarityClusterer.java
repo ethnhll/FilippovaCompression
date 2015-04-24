@@ -144,7 +144,7 @@ public class SimilarityClusterer {
 	}
 
 	//some of this is extraneous if the passed in strings to program are already somewhat clean
-	public static List<String> sanitize(String sent,Set<String> stoplist){
+	public static List<String> sanitize(String sent, Set<String> stoplist){
 		sent = sent.toLowerCase();//drop caps
 		sent = sent.replaceAll("(\\.|!|\\?|\\\"|,)", "");//drop end of sentence (and acronyms)
 		sent = sent.replaceAll("(-|:)"," ");//swap out non whitespace word seperators

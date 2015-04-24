@@ -14,12 +14,17 @@ def split_into_sentences(text):
 
 def cluster_sentences(sentence_file):
     old_dir = os.getcwd()
-    os.chdir('/home/hill1303/Documents/cse5525/FilipovaCompression/utils/cluster/bin')
+    os.chdir('/home/hill1303/Documents/cse5525/FilipovaCompression/utils/cluster')
     output = subprocess.check_output(
-        ['java', 'sentenceCluster.SimClusterMain', sentence_file])
-
+        ['java', '-cp', './bin', 'sentenceCluster.SimClusterMain', sentence_file])
     os.chdir(old_dir)
-    return output
+
+    cluster_strings = output.splitlines()
+    clusters = []
+    for i in cluster_strings:
+        clusters.append([int(cluster) for cluster in i.split(',')])
+
+    return clusters
 
 
 def prepare_word_info(text):

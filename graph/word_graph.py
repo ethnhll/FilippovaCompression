@@ -165,7 +165,6 @@ class Word_Graph:
             potential_paths.pop(0)
         #print(potential_paths)
         final_paths = list(zip(paths,distances))
-        #print(str(final_paths))
         i=0
         while i<len(final_paths):
             if len(final_paths[i][0])<min_length:
@@ -177,6 +176,8 @@ class Word_Graph:
         if final_paths:
             for i in range(len(final_paths[0][0])-1):
                 self.graph[final_paths[0][0][i]].shortest=final_paths[0][0][i+1]
+        print str([self.graph[i].word for i in final_paths[0][0]])
+
         return final_paths
 
 

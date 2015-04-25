@@ -32,6 +32,7 @@ def cluster_sentences(sentence_file, stop_word_file, centroid_width=8,
 
 def prepare_word_info(sentence, sentence_id):
     words = []
+    sentence = word_tokenize(sentence)
     # Start the index at 1, we will use 0 index for start symbol
     for word_index, word_tag in enumerate(nltk.pos_tag(sentence), start=1):
         word, tag = word_tag

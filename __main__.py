@@ -41,7 +41,7 @@ def main():
             word_graph = Word_Graph(sentences, stop_word_list)
             word_graph.process_graph()
             word_graph.reweight_edges('baseline')
-            paths = word_graph.k_shortest_path(5,50)
+            paths = word_graph.k_shortest_path(9,50)
             word_graph.print_graph()
 
 

@@ -1,4 +1,5 @@
 import os
+import string
 import subprocess
 
 __author__ = 'Ethan Hill'
@@ -8,13 +9,9 @@ from nltk.tokenize import sent_tokenize, word_tokenize
 
 WordInfo = namedtuple('WordInfo', 'word, tag, sentence_id, word_index')
 
-def split_into_sentences(text):
-    return [word_tokenize(sentence) for sentence in sent_tokenize(text)]
-
 
 def cluster_sentences(sentence_file, stop_word_file, centroid_width=8,
                       similarity_threshold=0.05):
-
 
     clusterer_path = os.path.join(
         'FilipovaCompression', 'utils', 'cluster', 'bin')
@@ -32,6 +29,7 @@ def cluster_sentences(sentence_file, stop_word_file, centroid_width=8,
 
 def prepare_word_info(sentence, sentence_id):
     words = []
+    sentence = ' '.join(i.strip(string.punctuation) for i in sentence.split())
     sentence = word_tokenize(sentence)
     # Start the index at 1, we will use 0 index for start symbol
     for word_index, word_tag in enumerate(nltk.pos_tag(sentence), start=1):

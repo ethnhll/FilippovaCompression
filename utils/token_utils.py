@@ -10,8 +10,8 @@ from nltk.tokenize import sent_tokenize, word_tokenize
 WordInfo = namedtuple('WordInfo', 'word, tag, sentence_id, word_index')
 
 
-def cluster_sentences(sentence_file, stop_word_file, centroid_width=8,
-                      similarity_threshold=0.05):
+def cluster_sentences(sentence_file, stop_word_file, centroid_width=16,
+                      similarity_threshold=0.06):
 
     clusterer_path = os.path.join(
         'FilipovaCompression', 'utils', 'cluster', 'bin')

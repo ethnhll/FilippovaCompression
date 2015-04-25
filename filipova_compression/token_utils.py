@@ -14,7 +14,7 @@ def split_into_sentences(text):
 
 def cluster_sentences(sentence_file):
     old_dir = os.getcwd()
-    os.chdir('/home/hill1303/Documents/cse5525/FilipovaCompression/utils/cluster')
+    os.chdir('utils/cluster')
     output = subprocess.check_output(
         ['java', '-cp', './bin', 'sentenceCluster.SimClusterMain', sentence_file])
     os.chdir(old_dir)
@@ -27,16 +27,13 @@ def cluster_sentences(sentence_file):
     return clusters
 
 
-def prepare_word_info(text):
-    token_sentences = []
-    for sentence_id, sentence in enumerate(split_into_sentences(text)):
-        words = []
-        # Start the index at 1, we will use 0 index for start symbol
-        for word_index, word_tag in enumerate(nltk.pos_tag(sentence), start=1):
-            word, tag = word_tag
-            words.append(WordInfo(word, tag, sentence_id, word_index))
-        token_sentences.append(words)
-    return token_sentences
+def prepare_word_info(sentence, sentence_id):
+    words = []
+    # Start the index at 1, we will use 0 index for start symbol
+    for word_index, word_tag in enumerate(nltk.pos_tag(sentence), start=1):
+        word, tag = word_tag
+        words.append(WordInfo(word, tag, sentence_id, word_index))
+    return words
 
 
 def make_test_sentences():

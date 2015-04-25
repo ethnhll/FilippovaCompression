@@ -28,16 +28,20 @@ def main():
         temp_file_path = os.path.join(os.getcwd(), 'split_tmp')
         clusters = token_utils.cluster_sentences(temp_file_path)
         os.remove(temp_file_path)
-        
 
-    test = token_utils.make_test_sentences()
-    f = open(stop_words)
-    stop_words = f.read().split()
-    word_graph = Word_Graph(test, stop_words)
-    word_graph.process_graph()
-    word_graph.invert_weights()
-    print(str(word_graph.Kshortest_path(5,3)))
-    word_graph.print_graph()
+        sentence_clusters = []
+        for cluster in clusters:
+            sentence_clusters.append(
+                [token_utils.prepare_word_info(split_sentences[index], index) for index in cluster])
+    with open(stop_words) as stop_word_file:
+        stop_word_list = stop_word_file.readlines()
+        for sentences in sentence_clusters:
+            word_graph = Word_Graph(sentences, stop_word_list)
+            word_graph.process_graph()
+            word_graph.invert_weights()
+            print(str(word_graph.Kshortest_path(5,3)))
+            word_graph.print_graph()
+
 
 
 if __name__ == '__main__':

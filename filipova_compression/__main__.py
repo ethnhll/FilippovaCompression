@@ -38,7 +38,7 @@ def main():
         for sentences in sentence_clusters:
             word_graph = Word_Graph(sentences, stop_word_list)
             word_graph.process_graph()
-            word_graph.invert_weights()
+            word_graph.reweight_edges('strong_links')
             print(str(word_graph.Kshortest_path(5,3)))
             word_graph.print_graph()
 

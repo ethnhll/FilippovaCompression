@@ -88,7 +88,9 @@ class Word_Graph:
         for node in self.graph.values():
             for node2, edge in node.edges.items():
                 weight = self.word_frequency[node.word] + self.word_frequency[node2.word]
-                node.edges[node2] = node.edges[node2] + weight/self.diff_sum(node, node2)        
+                diff = self.diff_sum(node, node2)
+                if (diff > 0):
+                    node.edges[node2] = node.edges[node2] + weight/diff        
 
     def diff_sum(self, node, child_node):
         sum = 0;
@@ -96,8 +98,6 @@ class Word_Graph:
             if sent in child_node.offset_positions:
                 if node.offset_positions[sent] < child_node.offset_positions[sent]:
                     sum = sum + (node.offset_positions[sent] - child_node.offset_positions[sent])**(-1)
-        if sum == 0:
-            sum = -1
         return sum
 
     def reweight_edges(self, weighting_type):

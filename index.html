@@ -1,6 +1,6 @@
 ﻿<!DOCTYPE html>
 <meta charset="utf-8">
-<script type="text/javascript" src="filipova_compression/utils/d3.min.js"></script>
+<script type="text/javascript" src="utils/d3.min.js"></script>
 <style>
     body {
         font: 10px sans-serif;
@@ -146,11 +146,7 @@ var path = svg.append("svg:g").selectAll("path")
             return "#000";
         }
     })
-	.style("stroke-width", function(d) { 
-        width = 1/d.weight;
-        if (width < 1)
-            width = width*20;
-        return width; });
+	.style("stroke-width", function(d) { return 1/d.weight; });
 
 // define the nodes
 var node = svg.selectAll(".node")

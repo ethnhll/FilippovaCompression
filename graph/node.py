@@ -3,7 +3,7 @@ from collections import defaultdict
 
 class Node:
     # Represents a node on the word graph
-    def __init__(self, node_count = 0, word_info=None, parent=None):
+    def __init__(self, node_count=0, word_info=None, parent=None):
         self.offset_positions ={}
         if word_info is not None:
             self.word = word_info.word

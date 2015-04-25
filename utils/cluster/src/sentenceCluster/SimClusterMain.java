@@ -17,7 +17,7 @@ public class SimClusterMain {
 		List<String> inputSents = Files.readAllLines(new File(args[0]).toPath(), Charset.defaultCharset() );
 		//clean up the sents in preperation to cluster
 		//it is assumed that the stoplist is in the same directory as the executable
-		Set<String> stoplist = SimilarityClusterer.loadStoplist("stoplist");
+		Set<String> stoplist = SimilarityClusterer.loadStoplist(args[1]);
 		List<List<String>> clusterSents = new ArrayList<List<String>>();
 		for(String s : inputSents) {
 			clusterSents.add(SimilarityClusterer.sanitize(s,stoplist));
@@ -26,9 +26,9 @@ public class SimClusterMain {
 		SimilarityClusterer c = new SimilarityClusterer(clusterSents);
 		int width = 9;
 		double thresh = 0.01;
-		if(args.length > 2) {
-			width = Integer.parseInt(args[1]);
-			thresh = Double.parseDouble(args[2]);
+		if(args.length > 3) {
+			width = Integer.parseInt(args[2]);
+			thresh = Double.parseDouble(args[3]);
 		}
 		c.setThresh(thresh);
 		c.setWidth(width);

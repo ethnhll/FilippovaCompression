@@ -10,9 +10,9 @@
 #      c) If word node does not exist, create a new a new node for it and an 
 #         edge with weight 1 from the previous node and add the sentence id to 
 #         its seen sentences list
-from node import Node
 from collections import defaultdict
 import json
+from node import Node
 
 
 class Word_Graph:
@@ -26,8 +26,6 @@ class Word_Graph:
         self.word_frequency = defaultdict(int)
         for sentence in sentences:
             self.add_sentence(sentence)
-
-    # TODO(ethan or lizzy): Add first sentence to word graph
 
     def add_sentence(self, sentence):
         # Adds a sentence to the word graph
@@ -123,7 +121,7 @@ class Word_Graph:
     def pop_edge(self,source,target):
         return self.graph[source].remove_edge(self.graph[target])
 
-    def Kshortest_path(self, min_length, K):
+    def k_shortest_path(self, min_length, K):
         paths=[]
         distances = []
         # Use shortest path 

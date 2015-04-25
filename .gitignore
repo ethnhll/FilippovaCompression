@@ -4,3 +4,6 @@
 filipova_compression/filipova_compression.pyproj
 *.sln
 split_tmp
+*.js
+*.html
+*.txt

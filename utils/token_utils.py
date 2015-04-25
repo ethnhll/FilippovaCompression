@@ -1,3 +1,4 @@
+import os
 import subprocess
 
 __author__ = 'Ethan Hill'
@@ -7,16 +8,19 @@ from nltk.tokenize import sent_tokenize, word_tokenize
 
 WordInfo = namedtuple('WordInfo', 'word, tag, sentence_id, word_index')
 
-
 def split_into_sentences(text):
     return [word_tokenize(sentence) for sentence in sent_tokenize(text)]
 
 
 def cluster_sentences(sentence_file, stop_word_file, centroid_width=8,
                       similarity_threshold=0.05):
+
+
+    clusterer_path = os.path.join(
+        'FilipovaCompression', 'utils', 'cluster', 'bin')
+
     output = subprocess.check_output(
-        ['java', '-cp', './FilipovaCompression/utils/cluster/bin',
-         'sentenceCluster.SimClusterMain', sentence_file, stop_word_file,
+        ['java', '-cp', clusterer_path, 'sentenceCluster.SimClusterMain', sentence_file, stop_word_file,
          str(centroid_width), str(similarity_threshold)])
     cluster_strings = output.splitlines()
     clusters = []

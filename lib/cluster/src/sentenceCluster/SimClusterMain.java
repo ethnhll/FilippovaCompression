@@ -24,9 +24,14 @@ public class SimClusterMain {
 		}
 		//and cluster them
 		SimilarityClusterer c = new SimilarityClusterer(clusterSents);
-		//this is as coarse as it can really go. note that some sentences are in clusters of size 1 (but not many)
-		c.setThresh(0.01);
-		c.setWidth(9);
+		int width = 9;
+		double thresh = 0.01;
+		if(args.length > 2) {
+			width = Integer.parseInt(args[1]);
+			thresh = Double.parseDouble(args[2]);
+		}
+		c.setThresh(thresh);
+		c.setWidth(width);
 		List<List<Integer>> clusters = c.cluster();
 		for(List<Integer> i : clusters) {
 			

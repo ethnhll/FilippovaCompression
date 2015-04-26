@@ -98,15 +98,30 @@ class Word_Graph:
                     sum = sum + (node.offset_positions[sent] - child_node.offset_positions[sent])**(-1)
         return sum
 
+    def weight_edges_with_salient_links(self):
+        self.weight_edges_with_diff()
+        for node in self.graph.values():
+            for node2, edge in node.edges.items():
+                freq_mult = (self.word_frequency[node.hash_counter]*self.word_frequency[node2.hash_counter])
+                if freq_mult > 0:
+                    weight = node.edges[node2] / freq_mult
+                else:
+                    weight = 1/node.edges[node2]
+                node.edges[node2] = weight
+
+
     def reweight_edges(self, weighting_type):
-        if (weighting_type=='baseline'):
+        if (weighting_type=='w0'):
             self.invert_weights()
             return
-        if (weighting_type=='strong_links'):
+        if (weighting_type=='w1'):
             self.weight_edges_with_strong_links()
             return
-        if(weighting_type=='diff'):
+        if(weighting_type=='w2'):
             self.weight_edges_with_diff()
+            return
+        if(weighting_type=='w3'):
+            self.weight_edges_with_salient_links()
             return
 
     def add_group_edges(self, edges_removed):

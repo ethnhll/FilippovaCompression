@@ -41,7 +41,7 @@ class Word_Graph:
                 current_node = self.GetWordNode(word_info, previous_node)
             self.graph[current_node.hash_counter] = current_node
             previous_node = current_node
-            self.word_frequency[word_info.word] += 1
+            self.word_frequency[current_node.hash_counter] += 1
         pass
         previous_node.add_edge(self.stop_node)
 
@@ -79,13 +79,13 @@ class Word_Graph:
     def weight_edges_with_strong_links(self):
         for node in self.graph.values():
             for node2, edge in node.edges.items():
-                weight = self.word_frequency[node.word] + self.word_frequency[node2.word]
+                weight = self.word_frequency[node.hash_counter] + self.word_frequency[node2.hash_counter]
                 node.edges[node2] = weight/edge
 
     def weight_edges_with_diff(self):
         for node in self.graph.values():
             for node2, edge in node.edges.items():
-                weight = self.word_frequency[node.word] + self.word_frequency[node2.word]
+                weight = self.word_frequency[node.hash_counter] + self.word_frequency[node2.hash_counter]
                 diff = self.diff_sum(node, node2)
                 if (diff > 0):
                     node.edges[node2] = node.edges[node2] + weight/diff        
@@ -106,7 +106,6 @@ class Word_Graph:
             self.weight_edges_with_strong_links()
             return
         if(weighting_type=='diff'):
-            self.weight_edges_with_strong_links
             self.weight_edges_with_diff()
             return
 

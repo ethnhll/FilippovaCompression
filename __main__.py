@@ -44,7 +44,7 @@ def main():
             word_graph.reweight_edges('baseline')
             paths = word_graph.k_shortest_path(9,50)
             if paths:
-                top_sentence = ' '.join([word_graph.graph[i].word for i in paths[0][0]])
+                top_sentence = ' '.join([word_graph.graph[i].word for i in paths[0][0]][1:-1])
             else:
                 top_sentence = 'No Sentence'
             print '\t%d. %s'%(cluster_id,top_sentence)

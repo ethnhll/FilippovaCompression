@@ -149,7 +149,8 @@ class Word_Graph:
         distances.append(distance)
         paths.append(path)
         potential_paths = []
-        for k in range(K-1):
+        k=0
+        while True:
             for i in range(len(paths[k])-1):
                 edges_removed=[]
                 spur_node = paths[k][i]
@@ -184,7 +185,10 @@ class Word_Graph:
             
             paths.append(potential_paths[0][0])
             distances.append(potential_paths[0][1])
-            potential_paths.pop(0)
+            cpath= potential_paths.pop(0)
+            if len(cpath[0])>=min_length and self.contains_verb(cpath[0]):
+                break
+            k+=1
         #print(potential_paths)
         final_paths = list(zip(paths,distances))
         i=0

@@ -41,8 +41,8 @@ def main():
         for cluster_id, sentences in enumerate(sentence_clusters):
             word_graph = Word_Graph(sentences, stop_word_list)
             word_graph.process_graph()
-            word_graph.reweight_edges('w3')
-            paths = word_graph.k_shortest_path(9,50)
+            word_graph.reweight_edges('w1')
+            paths = word_graph.k_shortest_path(8,50)
             if paths:
                 top_sentence = ' '.join([word_graph.graph[i].word for i in paths[0][0]][1:-1])
             else:

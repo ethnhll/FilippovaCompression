@@ -43,7 +43,7 @@
         justify-content: center;
     }
     .graph-box {
-        max-width: 95%;
+        max-width: 100%;
         padding: 7px;
         background-color: #f0f0f0;
         font-weight: bold;
@@ -118,7 +118,7 @@ function getQueryVariable(variable) {
   } 
   return "graph";
 }
-
+/*var drag = force.drag().on("dragstart", dragstart);*/
 // get the data
 d3.json("json/"+param1var+".json", function(error, graph) {
 
@@ -131,8 +131,8 @@ var force = d3.layout.force()
     .nodes(graph.nodes)
     .links(graph.links)
     .size([width, height])
-    .linkDistance(150)
-    .charge(-500)
+    .linkDistance(80)
+    .charge(-300)
     .on("tick", tick)
     .start();
 
@@ -177,7 +177,7 @@ var node = svg.selectAll(".node")
   .enter().append("g")
     .attr("class", "node")
     .call(force.drag)
-    //.on("click", click)
+    .on("click", click)
     .on("dblclick", dblclick);
 
 // add the nodes
@@ -261,7 +261,14 @@ function tick() {
 }
 
 });
-
+function click(d) {
+	if(d.fixed==false){
+		d3.select(this).classed("fixed", d.fixed = true);
+  }
+  else{
+		d3.select(this).classed("fixed", d.fixed = false);
+	}
+}
 // action to take on mouse double click
 function dblclick(d) {
     if (d3.select(this).select("circle").attr("r") != 10) {

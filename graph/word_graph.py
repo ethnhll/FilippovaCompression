@@ -153,13 +153,15 @@ class Word_Graph:
                         root_distance+=self.graph[root_path[-1]].edges[self.graph[spur_path[0]]]
                     final_path = root_path[:-1] + spur_path
                     potential_paths.append((final_path,distance+root_distance))
-            if not potential_paths:
-                break
             potential_paths.sort(key=lambda x: x[1])
             #print('print potential paths')
             #print(potential_paths[:3])
-            while(potential_paths[0][0] in paths):
+            while(potential_paths and potential_paths[0][0] in paths):
                 potential_paths.pop(0)
+                
+            if not potential_paths:
+                break
+            
             paths.append(potential_paths[0][0])
             distances.append(potential_paths[0][1])
             potential_paths.pop(0)
@@ -236,7 +238,7 @@ class Word_Graph:
         self.graph[0] = (self.start_node)
         self.graph[1] =(self.stop_node)
 
-    def print_graph(self):
+    def print_graph(self,name):
 ##        for node in self.graph.values():
 ##            print "\nCounter: %d  Word : %s  Tag: %s" %(node.hash_counter, node.word, node.tag)
 ##            print "EDGES"
@@ -252,7 +254,7 @@ class Word_Graph:
             for edge_node,weight in node.edges.items():
                  g["links"].append({"source": node.hash_counter, "target": edge_node.hash_counter, "weight": weight})
 
-        json.dump(g,open('graph.json','w'))
+        json.dump(g,open('FilipovaCompression/json/'+str(name)+'.json','w'))
 
     def contains_verb(self, path):
         for id in path:

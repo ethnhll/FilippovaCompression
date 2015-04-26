@@ -178,7 +178,7 @@ class Word_Graph:
         if final_paths:
             for i in range(len(final_paths[0][0])-1):
                 self.graph[final_paths[0][0][i]].shortest=final_paths[0][0][i+1]
-        print str([self.graph[i].word for i in final_paths[0][0]])
+
 
         return final_paths
 
@@ -253,7 +253,6 @@ class Word_Graph:
             g["nodes"][ID]['sentences'] = str(node.offset_positions)
             for edge_node,weight in node.edges.items():
                  g["links"].append({"source": node.hash_counter, "target": edge_node.hash_counter, "weight": weight})
-
         json.dump(g,open('FilipovaCompression/json/'+str(name)+'.json','w'))
 
     def contains_verb(self, path):

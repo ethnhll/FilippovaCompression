@@ -1,0 +1,304 @@
+﻿<!DOCTYPE html>
+<meta charset="utf-8">
+<script type="text/javascript" src="utils/d3.min.js"></script>
+<style>
+    body {
+        font: 10px sans-serif;
+    }
+    div {
+        border-radius: 25px;
+    }
+    path.link {
+        fill: none;
+        /*stroke: #333;*/
+        stroke-width: 1.5px;
+        stroke-opacity: .6;
+    }
+
+    circle {
+        fill: #ccc;
+        stroke: #fff;
+        stroke-width: 1.5px;
+    }
+
+    text {
+        font: 10px sans-serif;
+        pointer-events: none;
+        font-weight: bold;
+    }
+    .Aligner {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .Aligner2 {
+        /*display: flex;*/
+        align-items: center;
+        justify-content: center;
+        float:left;
+    }
+    .Aligner3 {
+        width:900px;
+        align-items: center;
+        justify-content: center;
+    }
+    .graph-box {
+        max-width: 95%;
+        padding: 7px;
+        background-color: #f0f0f0;
+        font-weight: bold;
+        vertical-align: bottom;
+    }
+    .toolbar {
+        width: 100px;
+        height:145px;
+        padding: 7px;
+        background-color: #555;
+        font-weight: bold;
+        align-items:center;
+    }
+    .legend {
+        width: 80px;
+        padding: 7px;
+        font-weight: bold;
+        text-align: center;
+        align-self:center;
+        margin-left:3px;
+        margin-right:2px;
+        margin-top:5px;
+        margin-bottom:5px;
+
+    }
+    .title {
+        width: 380px;
+        padding: 7px;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom:10px;
+    }
+</style>
+<body>
+<center><div class="title" style="background-color: #FFD633"><h1>Summary Word Graph</h1></div></center>
+<div class="Aligner">
+    <div class="Aligner2">
+        <div class="toolbar">
+<center>Legend</center></font>
+            <div class="Aligner2">
+                <div class="legend" style="background-color: #1F7A1F"><font color="#F8F8F8">Start Node</font></div>
+                <div class="legend" style="background-color: #00478F"><font color="#F8F8F8">Finish Node</font></div>
+                <div class="legend" style="background-color: #B20000"><font color="#F8F8F8">Shortest</font></div>
+                <font color="#F8F8F8"><center>Double click the nodes to expand!</center></font>
+            </div>
+        </div>
+		<center><br>
+<form id="frm1" action="index.html">
+  <b>Cluster:</b> <input type="text" name="cluster" style="width:58px"><br><br>
+  <input type="button" onclick="submit_form()" value="Submit">
+</form>
+</center>
+    </div>
+<div class="Aligner" >
+        <div class="graph-box" id="graph-box1"></div></div>
+    </div>
+<center> Speech And Language Recognition, Final Project, Group 6</center>
+<script>
+function submit_form() {
+    document.getElementById("frm1").submit();
+}
+var param1var = getQueryVariable("cluster");
+
+function getQueryVariable(variable) {
+  var query = window.location.search.substring(1);
+  var vars = query.split("&");
+  for (var i=0;i<vars.length;i++) {
+    var pair = vars[i].split("=");
+    if (pair[0] == variable) {
+      return pair[1];
+    }
+  } 
+  return "graph";
+}
+
+// get the data
+d3.json("json/"+param1var+".json", function(error, graph) {
+
+var color = d3.scale.category20();
+
+var width = 1000,
+    height = 580;
+
+var force = d3.layout.force()
+    .nodes(graph.nodes)
+    .links(graph.links)
+    .size([width, height])
+    .linkDistance(150)
+    .charge(-500)
+    .on("tick", tick)
+    .start();
+
+var svg = d3.select("#graph-box1").append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+// build the arrow.
+svg.append("svg:defs").selectAll("marker")
+    .data(["end"])      // Different link/path types can be defined here
+  .enter().append("svg:marker")    // This section adds in the arrows
+    .attr("id", String)
+    .attr("viewBox", "0 -5 10 10")
+    .attr("refX", 28)
+    .attr("refY", -1.5)
+    .attr("markerWidth", 6)
+    .attr("markerHeight", 6)
+	.attr("markerUnits","userSpaceOnUse")
+    .attr("orient", "auto")
+  .append("svg:path")
+    .attr("d", "M0,-5L10,0L0,5");
+
+// add the links and the arrows
+var path = svg.append("svg:g").selectAll("path")
+    .data(force.links())
+  .enter().append("svg:path")
+    .attr("class", "link")
+    .attr("marker-end", "url(#end)")
+    .attr("stroke", function (d) {
+        if (d.source.shortest == d.target.id) {
+            return "#33CC33";
+        }
+        else {
+            return "#000";
+        }
+    })
+	.style("stroke-width", function(d) { return 1/d.weight; });
+
+// define the nodes
+var node = svg.selectAll(".node")
+    .data(force.nodes())
+  .enter().append("g")
+    .attr("class", "node")
+    .call(force.drag)
+    //.on("click", click)
+    .on("dblclick", dblclick);
+
+// add the nodes
+node.append("circle")
+    .attr("r", 10)
+	.style("fill", function (d) {
+	    if (d.id == 1) { return "#00478F"; }
+	    else if (d.id == 0) { return "#1F7A1F";}
+	    else if (d.shortest >= 0) { return "#B20000"; }
+	    else { return "#D5D5D5"; }
+	});
+	
+node.append("title")
+    .text(function(d) { return d.id+": ("+d.word+", "+d.tag+")\n Sentences:"+d.sentences; });
+	
+
+path.append("title")
+    .text(function(d) { return d.weight; });
+
+// add the text 
+node.append("text")
+	.attr("text-anchor", "middle")
+    .attr("fill", function (d) {
+        if (d.shortest >= 0||d.id==1) { return "#F8F8F8";}
+        else {return "#080808";}
+    })
+	.attr("font-weight", "bold")
+	.attr("dy", ".4em")
+    .text(function(d) { return d.id; });
+
+var text = svg.append("svg:text")
+    .attr("x", 15)
+    .attr("y", 15)
+    .attr("dy", ".35em")
+    .attr("text-anchor", "left")
+    .text(function(d) { 
+			var shortest="Shortest path: ";
+			var i =0;
+			while(i!=-1){
+			 svg.selectAll('g.node')
+				.each(function(d) {
+					if(d.id==i){
+					i=d.shortest;
+					shortest=shortest+" "+d.word;}
+				});}
+			return shortest; 
+		});
+/*
+var bbox = text.node().getBBox();
+
+var rect = svg.append("svg:rect")
+    .attr("x", bbox.x)
+    .attr("y", bbox.y)
+    .attr("width", bbox.width)
+    .attr("height", bbox.height)
+    .style("fill", "#ccc")
+    .style("fill-opacity", ".3")
+    .style("stroke", "#666")
+    .style("stroke-width", "1.5px");
+*/
+	
+	
+// add the curvy lines
+function tick() {
+    path.attr("d", function(d) {
+        var dx = d.target.x - d.source.x,
+            dy = d.target.y - d.source.y,
+            dr = Math.sqrt(dx * dx + dy * dy);
+        return "M" + 
+            d.source.x + "," + 
+            d.source.y + "A" + 
+            dr + "," + dr + " 0 0,1 " + 
+            d.target.x + "," + 
+            d.target.y;
+    });
+
+    node
+        .attr("transform", function(d) { 
+  	    return "translate(" + d.x + "," + d.y + ")"; });
+
+}
+
+});
+
+// action to take on mouse double click
+function dblclick(d) {
+    if (d3.select(this).select("circle").attr("r") != 10) {
+        d3.select(this).select("circle").transition()
+            .duration(750)
+            .attr("r", 10)
+	        .style("fill", function (d) {
+	            if (d.id == 1) { return "#00478F"; }
+	            else if (d.id == 0) { return "#1F7A1F"; }
+	            else if (d.shortest >= 0) { return "#B20000"; }
+	            else { return "#D5D5D5"; }
+	        });
+        d3.select(this).select("text").transition()
+            .duration(750)
+            .attr("x", 0)
+            .style("fill", function (d) {
+                if (d.shortest >= 0||d.id==1) { return "#F8F8F8"; }
+                else { return "#080808"; }
+            })
+            .text(function (d) { return d.id; });
+    }
+    else {
+        var str = d.word + ", " + d.tag;
+        d3.select(this).select("text").transition()
+        .duration(750)
+        .attr("x", str.length*2+18)
+        .style("fill", "#000")
+        .style("fill", "#000")
+        .text(function (d) { return str; });
+        d3.select(this).select("circle").transition()
+            .duration(750)
+            .attr("r", 13)
+            .style("fill", "#FFCC00");
+    }
+}
+
+
+</script>
+</body>
+</html>

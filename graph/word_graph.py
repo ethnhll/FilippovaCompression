@@ -31,6 +31,7 @@ class Word_Graph:
         # Adds a sentence to the word graph
         # Sentence is list of pre-tagged words that are represented as named tuples (word, tag)
         previous_node = self.start_node
+        self.word_frequency[self.start_node.hash_counter] +=1
         for i, word_info in enumerate(sentence):
             if word_info.word in self.stop_words:
                 next_word = None
@@ -44,7 +45,7 @@ class Word_Graph:
             self.word_frequency[current_node.hash_counter] += 1
         pass
         previous_node.add_edge(self.stop_node)
-
+        self.word_frequency[self.stop_node.hash_counter] += 1
     # Either
     # (1) Gets the existing word node
     # (2) Adds an additional word node
@@ -76,6 +77,7 @@ class Word_Graph:
         for node in self.graph.values():
             for node2, edge in node.edges.items():
                 node.edges[node2] = 1/edge
+
     def weight_edges_with_strong_links(self):
         for node in self.graph.values():
             for node2, edge in node.edges.items():
@@ -88,7 +90,9 @@ class Word_Graph:
                 weight = self.word_frequency[node.hash_counter] + self.word_frequency[node2.hash_counter]
                 diff = self.diff_sum(node, node2)
                 if (diff > 0):
-                    node.edges[node2] = node.edges[node2] + weight/diff        
+                    node.edges[node2] = weight/diff 
+                else:
+                    node.edges[node2] = 1/node.edges[node2]       
 
     def diff_sum(self, node, child_node):
         sum = 0;
@@ -96,6 +100,8 @@ class Word_Graph:
             if sent in child_node.offset_positions:
                 if node.offset_positions[sent] < child_node.offset_positions[sent]:
                     sum = sum + (node.offset_positions[sent] - child_node.offset_positions[sent])**(-1)
+        if sum < 1 and sum > 0:
+            print 'word: ' + str(node.word) + ' word 2: ' + str(child_node.word)
         return sum
 
     def weight_edges_with_salient_links(self):
